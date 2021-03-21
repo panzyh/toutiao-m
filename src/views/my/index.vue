@@ -68,7 +68,7 @@
 
 <script >
 import { mapState } from 'vuex'
-import { getUSerInfo } from '@/api/user'
+import { getUserInfo } from '@/api/user'
 
 export default {
   name: 'MyIndex',
@@ -106,7 +106,7 @@ export default {
     },
     async loadUserInfo () {
       try {
-        const { data: res } = await getUSerInfo()
+        const { data: res } = await getUserInfo()
         this.userInfo = res.data
       } catch (e) {
         this.$toast('获取数据失败，请稍后重试')

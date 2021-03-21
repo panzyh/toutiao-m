@@ -31,7 +31,7 @@ export const sendSms = mobile => {
  * @returns {AxiosPromise}
  */
 
-export const getUSerInfo = () => {
+export const getUserInfo = () => {
   return request({
     method: 'GET',
     url: '/app/v1_0/user'
@@ -41,5 +41,12 @@ export const getUSerInfo = () => {
     //   //       token的数据格式：Bearer token数据, Bearer后面有空格
     //   Authorization: `Bearer ${store.state.user.token}`
     // }
+  })
+}
+
+export const getUserChannels = () => {
+  return request({
+    method: 'GET',
+    url: '/app/v1_0/user/channels'
   })
 }
