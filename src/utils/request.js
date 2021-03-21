@@ -26,5 +26,14 @@ request.interceptors.request.use((config) => {
 })
 
 // 响应拦截器
+request.interceptors.response.use((config) => {
+  // Do something before request is sent
+  // config ：本次请求的配置对象
+  // 注意：这里无比要返回 config 配置对象，否则请求就停在这里出不去了
+  return config
+}, (e) => {
+  // Do something with request error
+  return Promise.reject(e)
+})
 
 export default request

@@ -8,7 +8,8 @@
         type="info"
         size="small"
         round
-        icon="search" >
+        icon="search"
+        to="/search" >
         搜索
       </van-button >
     </van-nav-bar >
