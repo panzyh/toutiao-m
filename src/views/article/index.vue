@@ -87,6 +87,15 @@
           ref="article-content"
         ></div >
         <van-divider >正文结束</van-divider >
+
+        <!--  文章评论列表  -->
+        <comment-list
+          :source="article.art_id"
+          :list="commentList"
+          @onload-success="totalCommentCount = $event.total_count"
+          @reply-click="onReplyClick"
+        />
+
         <!-- 底部区域 -->
         <div class="article-bottom" >
           <van-button
@@ -94,12 +103,13 @@
             type="default"
             round
             size="small"
+            @click="isPostShow = true"
           >写评论
           </van-button >
           <van-icon
+            class="comment-icon"
             name="comment-o"
-            info="123"
-            color="#777"
+            :info="totalCommentCount"
           />
           <collect-article
             class="btn-item"
@@ -112,6 +122,17 @@
           />
           <van-icon name="share" color="#777777" ></van-icon >
         </div >
+
+        <!-- 发布评论 -->
+        <van-popup
+          v-model="isPostShow"
+          position="bottom"
+        >
+          <comment-post
+            :target="article.art_id"
+            @post-success="onPostSuccess"
+          />
+        </van-popup >
       </div >
 
       <!-- 加载失败：404 -->
@@ -127,6 +148,28 @@
         <van-button class="retry-btn" @click="loadArticle" >点击重试</van-button >
       </div >
     </div >
+
+    <!-- 评论回复 -->
+    <!--
+      弹出层是懒渲染的：只有在第一次展示的时候才会渲染里面的内容，之后它的关闭和显示都是在切换内容的显示和隐藏
+     -->
+    <van-popup
+      v-model="isReplyShow"
+      position="bottom"
+      style="height: 100%;"
+    >
+      <!--
+        v-if 条件渲染
+          true：渲染元素节点
+          false：不渲染
+       -->
+      <comment-reply
+        v-if="isReplyShow"
+        :comment="currentComment"
+        @reply-click="onReplyClick"
+        @close="isReplyShow = false"
+      />
+    </van-popup >
   </div >
 </template >
 
@@ -136,13 +179,26 @@ import { ImagePreview } from 'vant'
 import FollowUser from '@/components/follow-user'
 import CollectArticle from '@/components/collect-article'
 import LikeArticle from '@/components/like-article'
+import CommentList from './components/comment-list'
+import CommentPost from './components/comment-post'
+import CommentReply from './components/comment-reply'
 
 export default {
   name: 'ArticleIndex',
   components: {
     FollowUser,
     CollectArticle,
-    LikeArticle
+    LikeArticle,
+    CommentList,
+    CommentPost,
+    CommentReply
+  },
+  // 给所有的后代组件提供数据
+  // 注意：不要滥用
+  provide: function () {
+    return {
+      articleId: this.articleId
+    }
   },
   props: {
     articleId: {
@@ -153,9 +209,14 @@ export default {
   data () {
     return {
       article: {}, // 文章详情
-      loading: true, // 加载中的 loading状态
+      loading: true, // 加载中的 loading 状态
       errStatus: 0, // 失败的状态码
-      followLoading: false
+      followLoading: false,
+      totalCommentCount: 0, // 评论总数
+      isPostShow: false, // 控制发布评论的显示状态
+      commentList: [], // 评论列表
+      isReplyShow: false,
+      currentComment: {} // 当前点击回复的评论项
     }
   },
   computed: {},
@@ -195,6 +256,7 @@ export default {
       // 无论成功还是失败，都需要关闭 loading
       this.loading = false
     },
+
     previewImage () {
       // 得到所有的 img 节点
       const articleContent = this.$refs['article-content']
@@ -213,6 +275,20 @@ export default {
           })
         }
       })
+    },
+
+    onPostSuccess (data) {
+      // 关闭弹出层
+      this.isPostShow = false
+      // 将发布内容显示到列表顶部
+      this.commentList.unshift(data.new_obj)
+    },
+
+    onReplyClick (comment) {
+      this.currentComment = comment
+
+      // 显示评论回复弹出层
+      this.isReplyShow = true
     }
   }
 }
