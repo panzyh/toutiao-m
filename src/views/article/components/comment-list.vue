@@ -79,7 +79,7 @@ export default {
         //      评论的回复，则传递评论的 ID
         // 1. 请求获取数据
         const { data: res } = await getComments({
-          type: this.type, //  评论类型，a-对文章(article)的评论，c-对评论(comment)的回复
+          type: this.type, //  评论类型，a-对文章(article)的评论，c-对评论(comments)的回复
           source: this.source.toString(), // 源id，文章id或评论id
           offset: this.offset, // 获取评论数据的偏移量，值为评论id，表示从此id的数据向后取，不传表示从第一页开始读取数据
           limit: this.limit // 获取的评论数据个数，不传表示采用后端服务设定的默认每页数据量
